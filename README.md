@@ -20,5 +20,4 @@ This tool is ideal for developers and hobbyists who want a simple way to make lo
 - **Expose Local Server from Any Device on the Same Network**  
   The server does not need to be the device running NetHost. NetHost can operate on another device within the same network and still function normally, allowing you to expose local services seamlessly. 
 
-  ### currently it's work under progress
 ---

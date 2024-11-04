@@ -16,7 +16,9 @@ This tool is ideal for developers and hobbyists who want a simple way to make lo
 - **Serveo Status Handling**  
   One of the main challenges with using Serveo is its unpredictable downtime. However, **NetHost** can automatically detect the service status and seamlessly restore the tunneling process once it comes back online, ensuring uninterrupted access to your local services.
 - **SSH Server**  
-  One of the standout features of this tool is its ability to turn any internet-connected device into an SSH server with no additional setup required.
+  A key feature of NetHost is its ability to expose a local SSH server to the public, enabling users to securely connect to the SSH server from any network.
+- **Expose Local Server from Any Device on the Same Network**  
+  The server does not need to be the device running NetHost. NetHost can operate on another device within the same network and still function normally, allowing you to expose local services seamlessly. 
 
   ### currently it's work under progress
 ---

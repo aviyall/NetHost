@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Define color codes
 red="\033[0;31m"
 green="\033[0;32m"
 yellow="\033[0;33m"
@@ -50,10 +49,6 @@ http() {
     link=$(<"$temp_file")
     rm "$temp_file"
 }
-
-ssh_opt() {
-    ssh -T -R "$3:22:$hostname:22" serveo.net
-}
   
 tcp() {
     if [ -z "$4" ]; then
@@ -74,6 +69,10 @@ tcp() {
     echo -e "${green}Establishing SSH tunnel...${reset}"
     ssh -nT -R "$remote_port:$hostname:$3" serveo.net
     sleep 2
+}
+
+ssh_opt() {
+    ssh -T -R "$3:22:$hostname:22" serveo.net
 }
 
 while true; do
@@ -101,6 +100,7 @@ while true; do
         http "$@" & 
         http_pid=$!
         opt=1 
+        
     elif [ "$1" == "tcp" ]; then 
         if [ "$2" == "lh" ] || [ "$2" == "local" ]; then
             echo "Setting hostname to 'localhost'."
@@ -120,6 +120,7 @@ while true; do
         tcp "$@" & 
         tcp_pid=$!
         opt=2
+        
     elif [ "$1" == "ssh" ]; then
         if [ -z "$2" ]; then
             echo -e "${red}Hostname not specified. Exiting the script...${reset}"
@@ -138,6 +139,7 @@ while true; do
         ssh_opt "$@" & 
         ssh_pid=$!
         opt=3
+        
     else 
         echo -e "${red}Invalid protocol specified. Exiting the script...${reset}"
         exit 1

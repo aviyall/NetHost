@@ -1,81 +1,118 @@
-##  **UNDER DEVELOPMENT 🧑‍🏭**
-# NetHost
+# NetHost 🚀
 
-**NetHost** is a lightweight networking tool that leverages [Serveo](https://serveo.net), an online platform providing reverse SSH tunneling.
+NetHost is a lightweight networking tool that leverages [Serveo](https://serveo.net/), enabling you to expose local servers to the internet effortlessly, without requiring router or firewall configuration.
 
-With NetHost, you can expose a local server from your own computer or network to the internet without any router or firewall configurations.
+Whether you’re a developer looking for quick web hosting or a hobbyist needing secure SSH access, NetHost makes networking simple and effective.
 
-This tool is ideal for developers and hobbyists who want a simple way to make local services publicly accessible.
+## Key Features
 
-## Features
-- **Expose Local Services**  
-  Easily expose HTTP, TCP, and SSH traffic from your local network to the internet, making development and testing more convenient.
-- **Dedicated Web Hosting**  
-  NetHost allows you to host webpages on the internet for free with custom domain names. It also helps keep your website alive by sending periodic requests, making it an ideal solution for long-lasting web hosting.
-- **SSH Server**
-  A key feature of NetHost is its ability to expose a local SSH server to the public, enabling users to securely connect to the SSH server from any network.
-- **Expose Local Server from Any Device on the Same Network**  
-  The server does not need to be the device running NetHost. NetHost can operate on another device within the same network and still function normally, allowing you to expose local services seamlessly. 
+- **Expose Local Services**: Seamlessly expose HTTP, TCP, and SSH traffic from your local network to the internet for development and testing.
+- **Custom Web Hosting**: Host web pages online with a custom subdomain. NetHost ensures your website stays live by periodically sending requests.
+- **Public SSH Server**: Expose a local SSH server securely, allowing remote connections from any network.
+- **Network Flexibility**: Run NetHost on one device to expose services running on another within the same local network.
 
 ## Usage
 
-```shell
-./script_name.sh <protocol> <hostname> <Localport> [subdomain]
+```bash
+Nethost <protocol> <hostname> <local_port> [subdomain/remote_port/alias]
 ```
-- **Protocols** (REQUIRED)
-  - Specify the type of tunnel to create.
-  - There are three options available [ __http__ , __tcp__ , __ssh__ ].
-  - `http` > HTTP tunnel.
-  - `tcp` > TCP tunnel.
-  - `ssh` > SSH tunnel.
-- **Hostname** (REQUIRED)
-  - This Field can either be **local or public** ip address or hostname.
-  - __Ensure that there are no firewall restrictions for ssh port(22) on the host.__
-  - `lh` (shortcut for `localhost`)
-- **LocalPort** (REQUIRED)
-  - Port number should be between 1024–65535 is recommended
-  - For `ssh` keeping it in 22 is recommended
-- **Subdomain** (OPTIONAL)
-  - For `http` subdomain is optional
-  - For `tcp` there is nothing as subdomain
-  - For `ssh` subdomain is a REQUIRED field
-- **Exceptional Case in `tcp`**
-  - For `tcp` the 4th parameter termed as subdomain is configured as Remoteport.
-  - This field can be kept empty then default value 0 will be used
-  - 0 will assgin a random available portnumber
-- **Examples**
-  - **HTTP TUNNEL WITHOUT SUBDOMAIN ON LOCALHOST**
-    - ```ps
-      NetHost http lh 8080
-      ```
-  - **HTTP TUNNEL WITH SUBDOMAIN ON LOCALHOST**
-    - ```ps
-      NetHost http lh 8080 mysubdomain
-      ```
-  - **HTTP TUNNEL WITH SUBDOMAIN ON AN IP ADR**
-    - ```ps
-      NetHost http 192.168.1.24 8080 mysubdomain
-      ```
-  - **HTTP TUNNEL WITHOUT SUBDOMAIN ON LOCALHOST**
-    - ```ps
-      NetHost http lh 8080
-      ```
-  - **TCP TUNNEL ON LOCALHOST**
-    - ```ps
-      NetHost tcp lh 1234
-      ```
-  - **TCP TUNNEL ON LOCALHOST WITH REMOTEPORT**
-    - ```ps
-      NetHost tcp lh 1234 32545
-      ```
-  - **SSH TUNNEL ON LOCALHOST**
-    - ```ps
-      NetHost ssh lh 22 mysubdomain
-      ```
-  - **SSH TUNNEL ON IP ADR**
-    - ```ps
-      NetHost ssh 192.168.35.21 22 mysubdomain
-      ```
 
+### Positional Arguments
 
----
+- `<protocol>` (REQUIRED):
+  - Choose the type of tunnel:
+    - `http`: Expose HTTP traffic.
+    - `tcp`: Expose TCP traffic.
+    - `ssh`: Expose SSH traffic.
+
+- `<hostname>` (REQUIRED):
+  - Specify the target host:
+    - `lh`: Shortcut for localhost.
+    - Public or local IP addresses or hostnames are also valid.
+    - Ensure no firewall restrictions on port 22 on the host machine.
+
+- `<local_port>` (REQUIRED):
+  - Port on the host to forward traffic.
+  - Recommended range: `1024–65535`.
+  - For SSH, `22` is commonly used.
+
+- `[subdomain/remote_port/alias]` (OPTIONAL):
+  - For `http`: Specify a subdomain or leave blank for a random one.
+  - For `tcp`: This field is treated as a remote port. If blank, a random port is assigned.
+  - For `ssh`: This field is treated as an alias, This field is necessary.
+
+## Examples
+
+### HTTP Tunnels
+
+#### Without Subdomain:
+```bash
+Nethost http lh 8080
+```
+
+#### With Subdomain:
+```bash
+Nethost http lh 8080 mysubdomain
+```
+
+#### With Specific Host IP:
+```bash
+Nethost http 192.168.1.24 8080 mysubdomain
+```
+
+### TCP Tunnels
+
+#### Default Remote Port:
+```bash
+Nethost tcp lh 1234
+```
+
+#### Specific Remote Port:
+```bash
+Nethost tcp lh 1234 32545
+```
+
+### SSH Tunnels
+
+#### On localhost:
+```bash
+Nethost ssh lh 22 myalias
+```
+
+#### On Specific Host:
+```bash
+Nethost ssh 192.168.35.21 22 myalias
+```
+
+## Special Notes
+
+### HTTP Tunnel with Subdomain:
+- Provides a custom URL for your web services: `https://<subdomain>.serveo.net`.
+
+### TCP Tunnels:
+- If the remote port is unspecified (`0`), Serveo assigns a random port.
+
+### SSH Tunnels:
+- An alias is mandatory, allowing connections like:
+  ```bash
+  ssh -J serveo.net user@myalias
+  ```
+
+## System Requirements
+
+- Ensure `curl`, `ssh`, and `awk` are installed.
+- For TCP tunnels, `ncat` (Netcat) is required.
+
+## Error Handling
+
+- **Network Issues**:
+  - Automatically detects and waits for network reconnection, resuming tunnels afterward.
+- **Serveo Downtime**:
+  - Detects Serveo unavailability and retries until the service is back online.
+- **Invalid Subdomain**:
+  - Prompts an error if the chosen subdomain is unavailable.
+
+## Advanced Functionality
+
+- **Long-Term Hosting**: NetHost ensures reliability by sending periodic requests to keep the connection alive.
+- **Multi-Device Support**: Use NetHost on one device to expose services hosted on another device in the same network.

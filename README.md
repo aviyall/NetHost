@@ -11,10 +11,25 @@ Whether you’re a developer looking for quick web hosting or a hobbyist needing
 - **Public SSH Server**: Expose a local SSH server securely, allowing remote connections from any network.
 - **Network Flexibility**: Run NetHost on one device to expose services running on another within the same local network.
 
+## Steps to Install
+
+1. **Download the `.deb` File**
+
+   First, download the `nethost_1.0-1.deb` file from the GitHub repository.
+
+   - Go to the [GitHub Repository](https://github.com/aviyall/nethost) and download the `.deb` package.
+
+2. **Install the Package**
+
+   Open a terminal and navigate to the directory where the `.deb` file is located. Then, run the following command:
+
+   ```bash
+   sudo dpkg -i nethost_1.0-1.deb && sudo apt-get install -f
+   ```
 ## Usage
 
 ```bash
-Nethost <protocol> <hostname> <local_port> [subdomain/remote_port/alias]
+nethost <protocol> <hostname> <local_port> [subdomain/remote_port/alias]
 ```
 
 ### Positional Arguments
@@ -47,41 +62,41 @@ Nethost <protocol> <hostname> <local_port> [subdomain/remote_port/alias]
 
 #### Without Subdomain:
 ```bash
-Nethost http lh 8080
+nethost http lh 8080
 ```
 
 #### With Subdomain:
 ```bash
-Nethost http lh 8080 mysubdomain
+nethost http lh 8080 mysubdomain
 ```
 
 #### With Specific Host IP:
 ```bash
-Nethost http 192.168.1.24 8080 mysubdomain
+nethost http 192.168.1.24 8080 mysubdomain
 ```
 
 ### TCP Tunnels
 
 #### Default Remote Port:
 ```bash
-Nethost tcp lh 1234
+nethost tcp lh 1234
 ```
 
 #### Specific Remote Port:
 ```bash
-Nethost tcp lh 1234 32545
+nethost tcp lh 1234 32545
 ```
 
 ### SSH Tunnels
 
 #### On localhost:
 ```bash
-Nethost ssh lh 22 myalias
+nethost ssh lh 22 myalias
 ```
 
 #### On Specific Host:
 ```bash
-Nethost ssh 192.168.35.21 22 myalias
+nethost ssh 192.168.35.21 22 myalias
 ```
 
 ## Special Notes

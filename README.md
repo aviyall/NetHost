@@ -135,3 +135,6 @@ nethost ssh 192.168.35.21 22 myalias
 
 - **Long-Term Hosting**: NetHost ensures reliability by sending periodic requests to keep the connection alive.
 - **Multi-Device Support**: Use NetHost on one device to expose services hosted on another device in the same network.
+
+> [!NOTE]
+> **Serveo.net is often reported as being unreliable or down for extended periods.**

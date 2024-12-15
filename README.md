@@ -18,8 +18,12 @@ Whether you’re a developer looking for quick web hosting or a hobbyist needing
    First, download the `nethost_1.0-1.deb` file from the GitHub repository.
 
    - Go to the [GitHub Repository](https://github.com/aviyall/nethost) and download the `.deb` package.
+   ###              or
+   - ```bash
+     wget https://github.com/aviyall/NetHost/raw/refs/heads/main/nethost_1.0-1.deb    #Latest version
+     ```
 
-2. **Install the Package**
+3. **Install the Package**
 
    Open a terminal and navigate to the directory where the `.deb` file is located. Then, run the following command:
 

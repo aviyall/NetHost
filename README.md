@@ -19,7 +19,7 @@ Whether you’re a developer looking for quick web hosting or a hobbyist needing
    - Go to the [GitHub Repository](https://github.com/aviyall/nethost) and download the `.deb` package.
    ###              or
    - ```bash
-     wget https://github.com/aviyall/NetHost/raw/refs/heads/main/nethost_1.0-1.deb    #Latest version
+     wget https://github.com/aviyall/NetHost/raw/refs/heads/main/nethost_1.0-1.deb   
      ```
 
 3. **Install the Package**

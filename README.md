@@ -1,9 +1,9 @@
-# NetHost 🚀
+# NetHost       ![status](https://img.shields.io/uptimerobot/status/m798198859-ecf1064c616a7c3cbfac9734)
 
-NetHost is a lightweight networking tool that leverages [Serveo](https://serveo.net/)  ![status](https://img.shields.io/uptimerobot/status/m798198859-ecf1064c616a7c3cbfac9734), enabling you to expose local servers to the internet effortlessly, without requiring router or firewall configuration.
+NetHost is a lightweight networking tool that leverages [Serveo](https://serveo.net/), enabling you to expose local servers to the internet effortlessly, without requiring router or firewall configuration.
 
 Whether you’re a developer looking for quick web hosting or a hobbyist needing secure SSH access, NetHost makes networking simple and effective.
-
+ 
 ## Key Features
 
 - **Expose Local Services**: Seamlessly expose HTTP, TCP, and SSH traffic from your local network to the internet for development and testing.

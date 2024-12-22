@@ -134,6 +134,16 @@ nethost ssh 192.168.35.21 22 myalias
 - **Long-Term Hosting**: NetHost ensures reliability by sending periodic requests to keep the connection alive.
 - **Multi-Device Support**: Use NetHost on one device to expose services hosted on another device in the same network.
 
+> [!Important]
+> The `script.sh` file is provided to help you understand the code and to encourage your contributions. After making changes, submit a pull request, and I will merge it into the main branch.
+> After a particular number of changes to this file a new version of this tool (`nethost_*.*-*.deb`) will be released.
+
+> [!TIP]
+> Instead of the keyword `nethost` you can also use `nhost` on the terminal.
+> 
+> `lh` can be used for `localhost`.
+
 > [!NOTE]
 > **Serveo.net is often reported as being unreliable or down for extended periods.**
 > ### ![serveo](https://img.shields.io/uptimerobot/status/m798198859-ecf1064c616a7c3cbfac9734)
+

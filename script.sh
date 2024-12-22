@@ -52,7 +52,7 @@ httptunnel() {
         tunnel_pid=$!
     else
         printf "${green}Checking availability of subdomain '$subdomain'...${reset}\n"
-        if wget --spider "https://$subdomain.serveo.net"; then
+        if wget -q --spider "https://$subdomain.serveo.net"; then
             printf "${red}Subdomain '$subdomain' is not available. Exiting.${reset}\n"
             rm "$temp_file"
             exit 1

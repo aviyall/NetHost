@@ -144,6 +144,6 @@ nethost ssh 192.168.35.21 22 myalias
 > `lh` can be used for `localhost`.
 
 > [!NOTE]
-> **Serveo.net is often reported as being unreliable or down for extended periods.**
+> Serveo.net is often reported as being unreliable or down for extended periods.
 > ### ![serveo](https://img.shields.io/uptimerobot/status/m798198859-ecf1064c616a7c3cbfac9734)
 

@@ -170,6 +170,7 @@ monitor_tunnels() {
                 printf "${yellow}Serveo is up. Restarting tunnel...${reset}\n"
                 restart_tunnel "$@"
             fi
+
             if ! check_network; then
                 printf "${yellow}Internet connection lost. Waiting for internet connection...${reset}\n"
                 
@@ -191,8 +192,8 @@ monitor_tunnels() {
                 printf "${green}Checking Serveo status.${reset}\n"
                 ## check if serveo is up
                 if [[ "$serveo_status" -eq 1 ]]; then
-                    printf "${yellow}Serveo is down.${reset}\n"
-                    printf "${green}Waiting to come back up.${reset}\n"
+                    printf "${yellow}Serveo is down. Waiting to come back up...${reset}\n"
+                    
                     time3=$(cat /tmp/counter_value 2>/dev/null)
                     until [[ serveo_status -eq 0 ]]; do
                         sleep 10
@@ -209,6 +210,7 @@ monitor_tunnels() {
                     fi
 
                 fi
+                printf "${green}Serveo is UP.${reset}\n"
                 if [[ "$waiting_sec" -gt 0 ]]; then
                     printf "${yellow}Reconencting...Please wait $min minutes and $sec seconds${reset}\n"
                     sleep $waiting_sec
@@ -228,8 +230,7 @@ monitor_tunnels() {
                 sleep 5
                 restart_tunnel "$@"
             fi 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-
+            
             sleep 5
         done
     else
@@ -252,20 +253,17 @@ monitor_tunnels() {
                     sleep 10
                 done
                 sleep 2
-                printf "${green}Internet connection restored.${reset}\n"
-                printf "${green}Checking Serveo status.${reset}\n"
+                printf "${green}Internet connection restored. Checking Serveo status...${reset}\n"
                 ## check if serveo is up
                 if [[ "$serveo_status" -eq 1 ]]; then
-                    printf "${yellow}Serveo is down.${reset}\n"
-                    printf "${green}Waiting to come back up.${reset}\n"
+                    printf "${yellow}Serveo is down. Waiting to come back up...${reset}\n"
                     
                     until [[ serveo_status -eq 0 ]]; do
                         sleep 10
                     done
                     
-                    printf "${green}Serveo is back.${reset}\n"
-
                 fi
+                printf "${green}Serveo is UP.${reset}\n"
                 
                 printf "${green}Restarting tunnel...${reset}\n"
                 

@@ -51,7 +51,7 @@ nethost <protocol> <hostname> <local_port> [subdomain/remote_port/alias]
 - `<local_port>` (REQUIRED):
   - Port on the host to forward traffic.
   - Recommended range: `1024–65535`.
-  - For SSH, `22` is commonly used.
+  - For SSH, it's port `22` .
 
 - `[subdomain/remote_port/alias]` (OPTIONAL):
   - For `http`: Specify a subdomain or leave blank for a random one.

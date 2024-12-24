@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trap 'cleanup; exiting; exit' SIGINT SIGTERM
+trap 'cleanup; exiting; exit 1' SIGINT SIGTERM
 
 red="\033[0;31m"
 green="\033[0;32m"
@@ -16,23 +16,26 @@ cleanup() {
     sleep 1
     kill $(pgrep -t $(tty | sed 's/\/dev\///') ssh) 2>/dev/null
 }
+
 exiting() {
     kill "$timer_pid" 2>/dev/null
     kill "$mon_serveo_pid" 2>/dev/null
     printf "${yellow}EXITING...${reset}\n"
 }
+
+#function to monitor serveo status
 serveo_stat(){
     curl -sf -I --connect-timeout 5 "https://serveo.net" &>/dev/null || \
     curl -sf -I --connect-timeout 5 "https://serveo.net" &>/dev/null || \
     curl -sf -I --connect-timeout 5 "https://serveo.net" &>/dev/null
 }
-
+# function to check network connection
 check_network() {
     local url="https://www.google.com/generate_204"
     curl -sf -I --connect-timeout 5 "$url" &>/dev/null || \
     curl -sf -I --connect-timeout 5 "$url" &>/dev/null
 }
-
+# to keep the http tunnel alive by sending periodic requests
 keepalive() {
     local url=$(echo "$1" | tr -d '\n\r' | xargs)
     while true; do
@@ -105,8 +108,17 @@ tcptunnel() {
 }
 
 sshtunnel() {
+    if [[ "$3" -ne 22 ]]; then
+        printf "${red}Local port '$3' is not allowed TRY with '22'. Exiting...${reset}\n"
+        exit 1
+    fi
+    
+    if [[ "$4" -eq 0 ]]; then
+        printf "${red}Public hostname alias not specified. Exiting...${reset}\n"
+        exit 1
+    fi
     printf "${green}Establishing SSH tunnel...${reset}\n"
-    ssh -T -R "$3:22:$host:22" serveo.net &
+    ssh -T -R "$4:22:$host:22" serveo.net &
     ssh_pid=$!
 
     sleep 5
@@ -136,6 +148,8 @@ restart_tunnel() {
             ;;
     esac
 }
+
+#a timer function to keep track of time
 timer() {
     counter=0
     while true; do
@@ -144,6 +158,7 @@ timer() {
         echo "$counter" > /tmp/counter_value
     done
 }
+ 
 moniter_serveo(){
     while true; do
         if ! serveo_stat; then 
@@ -155,135 +170,105 @@ moniter_serveo(){
     done
 }
 
+#function to check network connection and serveo status and restart tunnel accordingly
+check_connection(){
+    timer &
+    timer_pid=$!
+
+    while true; do
+        if [[ "$serveo_status" -eq 1 ]]; then
+            printf "${yellow}Serveo is down. Waiting to get back ${reset}\n"
+            cleanup
+            until [[ "$serveo_status" -eq 0 ]]; do
+                sleep 5
+            done
+            printf "${yellow}Serveo is up. Restarting tunnel...${reset}\n"
+            restart_tunnel "$@"
+        fi
+
+        if ! check_network; then
+            printf "${yellow}Internet connection lost. Waiting for internet connection...${reset}\n"
+            
+            cleanup
+            #kill moniterserveo
+            kill "$mon_serveo_pid"
+            time1=$(cat /tmp/counter_value 2>/dev/null)
+            until check_network; do
+                sleep 10
+            done
+            time2=$(cat /tmp/counter_value 2>/dev/null)
+            down_time=$(( (time2 - time1) ))
+            waiting_sec=$(( $1 - down_time ))
+            min=$(( waiting_sec / 60))
+            sec=$(( waiting_sec % 60))
+            moniter_serveo &
+            mon_serveo_pid=$!
+            printf "${green}Internet connection restored. Checking Serveo status...${reset}\n"
+            ## check if serveo is up
+            if [[ "$serveo_status" -eq 1 ]]; then
+                echo -e "\n"
+                printf "${yellow}Serveo is down. Waiting to come back up...${reset}\n"
+                
+                time3=$(cat /tmp/counter_value 2>/dev/null)
+                until [[ serveo_status -eq 0 ]]; do
+                    sleep 10
+                done
+                printf "${green}Serveo is back UP.${reset}\n"
+                time4=$(cat /tmp/counter_value 2>/dev/null)
+                serveo_down_time=$(( (time4 - time3) ))
+                if [[ "$serveo_down_time" -gt "$waiting_sec" ]]; then
+                    :
+                else
+                    final_waiting_time=$(( (waiting_sec - serveo_down_time) ))
+                    if [[ "$final_waiting_time" -gt 0 ]]; then
+                        sleep "$final_waiting_time"
+                    fi
+                fi
+
+            fi
+            
+            if [[ "$waiting_sec" -gt 0 ]]; then
+                echo -e "\n"
+                printf "${yellow}Reconencting...Please wait $min minutes and $sec seconds${reset}\n"
+                sleep $waiting_sec
+            else
+                printf "${green}Restarting tunnel...${reset}\n"
+            fi
+            restart_tunnel "$@"
+        
+        fi
+
+        #if tunnel process is stopped unexpectedly then restart tunnel
+        if  { [[ "$opt" -eq 1 ]] && ! ps -p "$tunnel_pid" &>/dev/null; } || \
+            { [[ "$opt" -eq 2 ]] && ! ps -p "$tcp_pid" &>/dev/null; } || \
+            { [[ "$opt" -eq 3 ]] && ! ps -p "$ssh_pid" &>/dev/null; }; then
+            printf "${yellow}Tunnel process has stopped unexpectedly. Restarting...${reset}\n"
+            cleanup
+            sleep 5
+            restart_tunnel "$@"
+        fi 
+        
+        sleep 5
+    done
+
+}
+# function to monitor each tunnel case
 monitor_tunnels() {
     if [[ "$opt" -eq 1 && -n "$4" ]]; then
-        timer &
-        timer_pid=$!
 
-        while true; do
-            if [[ "$serveo_status" -eq 1 ]]; then
-                printf "${yellow}Serveo is down. Waiting to get back ${reset}\n"
-                cleanup
-                until [[ "$serveo_status" -eq 0 ]]; do
-                    sleep 5
-                done
-                printf "${yellow}Serveo is up. Restarting tunnel...${reset}\n"
-                restart_tunnel "$@"
-            fi
+        check_connection 600
 
-            if ! check_network; then
-                printf "${yellow}Internet connection lost. Waiting for internet connection...${reset}\n"
-                
-                cleanup
-                #kill moniterserveo
-                kill "$mon_serveo_pid"
-                time1=$(cat /tmp/counter_value 2>/dev/null)
-                until check_network; do
-                    sleep 10
-                done
-                time2=$(cat /tmp/counter_value 2>/dev/null)
-                down_time=$(( (time2 - time1) ))
-                waiting_sec=$(( 600 - down_time ))
-                min=$(( waiting_sec / 60))
-                sec=$(( waiting_sec % 60))
-                moniter_serveo &
-                mon_serveo_pid=$!
-                printf "${green}Internet connection restored...${reset}\n"
-                printf "${green}Checking Serveo status.${reset}\n"
-                ## check if serveo is up
-                if [[ "$serveo_status" -eq 1 ]]; then
-                    printf "${yellow}Serveo is down. Waiting to come back up...${reset}\n"
-                    
-                    time3=$(cat /tmp/counter_value 2>/dev/null)
-                    until [[ serveo_status -eq 0 ]]; do
-                        sleep 10
-                    done
-                    time4=$(cat /tmp/counter_value 2>/dev/null)
-                    serveo_down_time=$(( (time4 - time3) ))
-                    if [[ "$serveo_down_time" -gt "$waiting_sec" ]]; then
-                        :
-                    else
-                        final_waiting_time=$(( (waiting_sec - serveo_down_time) ))
-                        if [[ "$final_waiting_time" -gt 0 ]]; then
-                           sleep "$final_waiting_time"
-                        fi
-                    fi
+    elif [[ "$opt" -eq 1 && -z "$4" ]]; then
+        
+        check_connection 0
 
-                fi
-                printf "${green}Serveo is UP.${reset}\n"
-                if [[ "$waiting_sec" -gt 0 ]]; then
-                    printf "${yellow}Reconencting...Please wait $min minutes and $sec seconds${reset}\n"
-                    sleep $waiting_sec
-                else
-                    printf "${green}Restarting tunnel...${reset}\n"
-                fi
-                restart_tunnel "$@"
-            
-            fi
+    elif [[ "$opt" -eq 2 ]]; then
 
-            
-            if  { [[ "$opt" -eq 1 ]] && ! ps -p "$tunnel_pid" &>/dev/null; } || \
-                { [[ "$opt" -eq 2 ]] && ! ps -p "$tcp_pid" &>/dev/null; } || \
-                { [[ "$opt" -eq 3 ]] && ! ps -p "$ssh_pid" &>/dev/null; }; then
-                printf "${yellow}Tunnel process has stopped unexpectedly. Restarting...${reset}\n"
-                cleanup
-                sleep 5
-                restart_tunnel "$@"
-            fi 
-            
-            sleep 5
-        done
-    else
-        while true; do
-            if [[ "$serveo_status" -eq 1 ]]; then
-                printf "${yellow}Serveo is down. Waiting to get back ${reset}\n"
-                cleanup
-                until [[ "$serveo_status" -eq 0 ]]; do
-                    sleep 5
-                done
-                printf "${yellow}Serveo is up. Restarting tunnel...${reset}\n"
-                restart_tunnel "$@"
-            fi
+        check_connection 120
 
-            if ! check_network; then
-            
-                printf "${yellow}Internet connection lost. Waiting for internet connection...${reset}\n"
-                cleanup
-                until check_network; do
-                    sleep 10
-                done
-                sleep 2
-                printf "${green}Internet connection restored. Checking Serveo status...${reset}\n"
-                ## check if serveo is up
-                if [[ "$serveo_status" -eq 1 ]]; then
-                    printf "${yellow}Serveo is down. Waiting to come back up...${reset}\n"
-                    
-                    until [[ serveo_status -eq 0 ]]; do
-                        sleep 10
-                    done
-                    
-                fi
-                printf "${green}Serveo is UP.${reset}\n"
-                
-                printf "${green}Restarting tunnel...${reset}\n"
-                
-                restart_tunnel "$@"
-            
-            fi
+    elif [[ "$opt" -eq 3 ]]; then
 
-            if [[ "$serveo_status" -ne 1 ]]; then
-                if { [[ "$opt" -eq 1 ]] && ! ps -p "$tunnel_pid" &>/dev/null; } || \
-                   { [[ "$opt" -eq 2 ]] && ! ps -p "$tcp_pid" &>/dev/null; } || \
-                   { [[ "$opt" -eq 3 ]] && ! ps -p "$ssh_pid" &>/dev/null; }; then
-                    printf "${yellow}Tunnel process has stopped unexpectedly. Restarting...${reset}\n"
-                    cleanup
-                    sleep 20
-                    restart_tunnel "$@"
-                fi 
-            fi                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-
-            sleep 10
-        done
+        check_connection 120
 
     fi
 
@@ -292,19 +277,22 @@ monitor_tunnels() {
 
 
 main() {
+    # Check if internet connection is available
     if ! check_network; then
         printf "${red}No internet connection. Exiting.${reset}\n"
         exit 1
     fi
+    # Check if Serveo is up
     if ! serveo_stat; then
         printf "${red}SERVEO IS DOWN. Exiting.${reset}\n"
         exit 1
     fi
+
     if [[ -z $1 ]]; then
         printf "${red}Protocol not specified. Exiting.${reset}\n"
         exit 1
     fi
-
+    # Check if hostname is specified
     if [[ "$2" == "lh" ]]; then
         host="localhost"
     elif [[ -z $2 ]]; then
@@ -313,7 +301,7 @@ main() {
     else
         host="$2"
     fi
-
+    # condition for each case
     case "$1" in
         http)
             opt=1
@@ -327,7 +315,7 @@ main() {
             ;;
         ssh)
             opt=3
-            [[ -z "$3" ]] && { printf "${red}Public hostname alias not specified. Exiting.${reset}\n"; exit 1; }
+            [[ -z "$3" ]] && { printf "${red}SSH port '22' not specified. Exiting.${reset}\n"; exit 1; }
             sshtunnel "$@"
             ;;
         *)
@@ -335,10 +323,11 @@ main() {
             exit 1
             ;;
     esac
+
     moniter_serveo &
     mon_serveo_pid=$!
+
     monitor_tunnels "$@"
-    
 }
 
 main "$@"

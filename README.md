@@ -15,10 +15,10 @@ Whether you’re a developer looking for quick web hosting or a hobbyist needing
 
 1. **Download the `.deb` File**
 
-   First, download the `nethost_*.*-*.deb` file from the GitHub repository.
+   First, download the `nethost_v*.*.*.deb` file from the GitHub repository.
    Or just use this wget command
    - ```bash
-     wget https://github.com/aviyall/NetHost/raw/refs/heads/main/nethost_1.0-1.deb   
+     wget https://github.com/aviyall/NetHost/raw/refs/heads/main/nethost_v1.0.1.deb   
      ```
 
 3. **Install the Package**
@@ -26,7 +26,7 @@ Whether you’re a developer looking for quick web hosting or a hobbyist needing
    Open a terminal and navigate to the directory where the `.deb` file is located. Then, run the following command:
 
    ```bash
-   sudo dpkg -i nethost_1.0-1.deb && sudo apt-get install -f
+   sudo dpkg -i nethost_v1.0.1.deb && sudo apt-get install -f
    ```
 ## Usage
 

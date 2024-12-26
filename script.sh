@@ -188,21 +188,25 @@ check_connection(){
 
         if ! check_network; then
             printf "${yellow}Internet connection lost. Waiting for internet connection...${reset}\n"
-            
             cleanup
-            #kill moniterserveo
             kill "$mon_serveo_pid"
+
             time1=$(cat /tmp/counter_value 2>/dev/null)
             until check_network; do
                 sleep 10
             done
             time2=$(cat /tmp/counter_value 2>/dev/null)
+
             down_time=$(( (time2 - time1) ))
+
             waiting_sec=$(( $1 - down_time ))
+
             min=$(( waiting_sec / 60))
             sec=$(( waiting_sec % 60))
+
             moniter_serveo &
             mon_serveo_pid=$!
+
             printf "${green}Internet connection restored. Checking Serveo status...${reset}\n"
             ## check if serveo is up
             if [[ "$serveo_status" -eq 1 ]]; then
@@ -213,9 +217,11 @@ check_connection(){
                 until [[ serveo_status -eq 0 ]]; do
                     sleep 10
                 done
-                printf "${green}Serveo is back UP.${reset}\n"
                 time4=$(cat /tmp/counter_value 2>/dev/null)
+                
+                printf "${green}Serveo is back UP.${reset}\n"
                 serveo_down_time=$(( (time4 - time3) ))
+                
                 if [[ "$serveo_down_time" -gt "$waiting_sec" ]]; then
                     :
                 else
@@ -264,11 +270,11 @@ monitor_tunnels() {
 
     elif [[ "$opt" -eq 2 ]]; then
 
-        check_connection 120
+        check_connection 100
 
     elif [[ "$opt" -eq 3 ]]; then
 
-        check_connection 120
+        check_connection 100
 
     fi
 

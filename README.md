@@ -119,6 +119,7 @@ nethost ssh 192.168.35.21 22 myalias
 
 - Ensure `curl`, `ssh`, and `awk` are installed.
 - For TCP tunnels, `ncat` (Netcat) is required.
+- Supported operating systems: Linux (any common distros).
 
 ## Error Handling
 
@@ -136,7 +137,7 @@ nethost ssh 192.168.35.21 22 myalias
 
 > [!Important]
 > The `script.sh` file is provided to help you understand the code and to encourage your contributions. After making changes, submit a pull request, and I will merge it into the main branch.
-> After a particular number of changes to this file a new version of this tool (`nethost_*.*-*.deb`) will be released.
+> After a particular number of changes to this file a new version of this tool (`nethost_*.*.*.deb`) will be released.
 
 > [!TIP]
 > Instead of the keyword `nethost` you can also use `nhost` on the terminal.

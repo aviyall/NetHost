@@ -49,10 +49,8 @@ nethost <protocol> <hostname> <local_port> [subdomain/remote_port/alias]
     - Ensure no firewall restrictions on port 22 on the host machine.
 
 - `<local_port>` (REQUIRED):
-  - Port on the host to forward traffic.
-  - Recommended range: `1024–65535`.
-  - For SSH, it's port `22` .
-
+  - Port on the host machine.
+  
 - `[subdomain/remote_port/alias]` (OPTIONAL):
   - For `http`: Specify a subdomain or leave blank for a random one.
   - For `tcp`: This field is treated as a remote port. If blank, a random port is assigned.
@@ -101,15 +99,19 @@ nethost ssh lh 22 myalias
 nethost ssh 192.168.35.21 22 myalias
 ```
 
+#### connect to ssh server with : `ssh -J serveo.net user@myalias`
+
 ## Special Notes
 
 ### HTTP Tunnel with Subdomain:
 - Provides a custom URL for your web services: `https://<subdomain>.serveo.net`.
 
 ### TCP Tunnels:
-- If the remote port is unspecified (`0`), Serveo assigns a random port.
+- Recommended range for local port : `1024–65535`.
+- If the remote port is kept as `0`, Serveo assigns a random port. (better to use `0` in most cases)
 
 ### SSH Tunnels:
+- For SSH tunnel to work local port should be `22` .
 - An alias is mandatory, allowing connections like:
   ```bash
   ssh -J serveo.net user@myalias

@@ -18,7 +18,7 @@ Whether you’re a developer looking for quick web hosting or a hobbyist needing
    First, download the `nethost_v*.*.*.deb` file from the GitHub repository.
    Or just use this wget command
    - ```bash
-     wget https://github.com/aviyall/NetHost/raw/refs/heads/main/nethost_v1.0.1.deb   
+     wget https://github.com/aviyall/NetHost/raw/refs/heads/main/nethost_v1.2.0.deb   
      ```
 
 3. **Install the Package**
@@ -31,30 +31,19 @@ Whether you’re a developer looking for quick web hosting or a hobbyist needing
 ## Usage
 
 ```bash
-nethost <protocol> <hostname> <local_port> [subdomain/remote_port/alias]
+Usage: nhost [OPTIONS]
+
+Options:
+  -o,  --option       'http' or 'tcp' or 'ssh' 
+  -h,  --hostname     Specify the hostname
+  -lp, --local-port   Set the local port number
+  -rp, --remote-port  Set the remote port number
+  -s,  --subdomain    Coustom subdomain of http tunnel
+  -a,  --alias        Assign an alias for ssh
+
+  -H,  --help         Show this help message 
 ```
 
-### Positional Arguments
-
-- `<protocol>` (REQUIRED):
-  - Choose the type of tunnel:
-    - `http`: Expose HTTP traffic.
-    - `tcp`: Expose TCP traffic.
-    - `ssh`: Expose SSH traffic.
-
-- `<hostname>` (REQUIRED):
-  - Specify the target host:
-    - `lh`: Shortcut for localhost.
-    - Public or local IP addresses or hostnames are also valid.
-    - Ensure no firewall restrictions on port 22 on the host machine.
-
-- `<local_port>` (REQUIRED):
-  - Port on the host machine.
-  
-- `[subdomain/remote_port/alias]` (OPTIONAL):
-  - For `http`: Specify a subdomain or leave blank for a random one.
-  - For `tcp`: This field is treated as a remote port. If blank, a random port is assigned.
-  - For `ssh`: This field is treated as an alias, This field is necessary.
 
 ## Examples
 
@@ -62,44 +51,44 @@ nethost <protocol> <hostname> <local_port> [subdomain/remote_port/alias]
 
 #### Without Subdomain:
 ```bash
-nethost http lh 8080
+nhost -o http -h hostname -lp 8080
+or
+serveo -o http -h hostname -lp 8080
 ```
 
 #### With Subdomain:
 ```bash
-nethost http lh 8080 mysubdomain
-```
-
-#### With Specific Host IP:
-```bash
-nethost http 192.168.1.24 8080 mysubdomain
+nhost -o http -h hostname -lp 8080 -s mysubdomain
+or
+serveo -o http -h hoatname -lp 8080 -s mysubdomain
 ```
 
 ### TCP Tunnels
 
 #### Default Remote Port:
 ```bash
-nethost tcp lh 1234
+nhost -o tcp -h hostname -lp 1234  #set --remote-port empty or 0 for random remote port
+or
+serveo -o tcp -h hostname -lp 1234
 ```
 
 #### Specific Remote Port:
 ```bash
-nethost tcp lh 1234 32545
+nhost -o tcp -h hostname -lp 1234 -rp 32545
+or
+serveo -o tcp -h hostname -lp 1234 -rp 32545
 ```
 
-### SSH Tunnels
+### SSH tunnel
 
-#### On localhost:
+#### THIS EXPOSES YOUR LOCAL SSH SERVER TO THE PUBLIC
 ```bash
-nethost ssh lh 22 myalias
+nhost -o ssh -h hostname -a myalias #leave --local-port(-lp) empty or 22
+or 
+serveo -o ssh -h hostname -a myalias
 ```
-
-#### On Specific Host:
-```bash
-nethost ssh 192.168.35.21 22 myalias
-```
-
 #### connect to ssh server with : `ssh -J serveo.net user@myalias`
+
 
 ## Special Notes
 
@@ -137,14 +126,14 @@ nethost ssh 192.168.35.21 22 myalias
 - **Long-Term Hosting**: NetHost ensures reliability by sending periodic requests to keep the connection alive.
 - **Multi-Device Support**: Use NetHost on one device to expose services hosted on another device in the same network.
 
-> [!Important]
-> The `script.sh` file is provided to help you understand the code and to encourage your contributions. After making changes, submit a pull request, and I will merge it into the main branch.
-> After a particular number of changes to this file a new version of this tool (`nethost_*.*.*.deb`) will be released.
+## Pull Requests
+
+The `script.sh` file is provided to help you understand the code and to encourage your contributions. After making changes, submit a pull request, and I will merge it into the main branch.
+After a particular number of changes to this file a new version of this tool (`nethost_*.*.*.deb`) will be released.
 
 > [!TIP]
-> Instead of the keyword `nethost` you can also use `nhost` on the terminal.
+> Instead of the keyword `nhost` you can also use `serveo` on the terminal.
 > 
-> `lh` can be used for `localhost`.
 
 > [!NOTE]
 > Serveo.net is often reported as being unreliable or down for extended periods.

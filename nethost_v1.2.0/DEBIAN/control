@@ -1,0 +1,8 @@
+Package: nethost
+Version: 1.2.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: curl, wget, ncat, ssh
+Maintainer: Avneeth Hareesh <aviyall.git@gmail.com>
+Description: A Bash script to establish HTTP, TCP, and SSH tunnels using Serveo.

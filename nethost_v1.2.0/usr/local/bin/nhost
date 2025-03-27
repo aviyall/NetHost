@@ -51,7 +51,7 @@ while [[ $# -gt 0 ]]; do
             hostname="$2"
             shift 2
             ;;
-        -lp|--local-port) 
+        -lp|-p|--local-port) 
             if [[ -z "$2" || "$2" == -* ]]; then
                 echo "Error: -lp|--local-port requires a value."
                 exit 1
@@ -94,7 +94,6 @@ while [[ $# -gt 0 ]]; do
 done
 
 cleanup() {
-    printf "${yellow}Cleaning up processes...${reset}\n"
     kill "$req_pid" 2>/dev/null
     kill "$tunnel_pid" 2>/dev/null
     kill "$tcp_pid" 2>/dev/null
@@ -130,8 +129,8 @@ keepalive() {
 
 reg_sshkey() {
     printf "${yellow}To request a particular subdomain, you first need to register your SSH public key.\n\
-            To register, visit one of the addresses below to log in with your Google or GitHub account.\n\
-            After registering, you'll be able to request your subdomain the next time you connect to Serveo.${reset}\n"
+To register, visit one of the addresses below to log in with your Google or GitHub account.\n\
+After registering, you'll be able to request your subdomain the next time you connect to Serveo.${reset}\n"
     if ls ~/.ssh/id_rsa >/dev/null 2>&1; then
 
         cd ~/.ssh || exit
@@ -142,7 +141,6 @@ reg_sshkey() {
             -e 's/+/%2B/g' \
             -e 's/=/ %3D/g')
 
-        echo ""
         echo ""
         echo "register with google account:   https://serveo.net/verify/google?fp=$encodedFingerprint"
         echo "register with github account:   https://serveo.net/verify/github?fp=$encodedFingerprint"
@@ -192,7 +190,6 @@ httptunnel() {
         ssh -nT -R "$port:$hostname:$local_port" serveo.net | stdbuf -oL awk 'NR==1 {print $5}' > "$temp_file" &
         tunnel_pid=$!
     else
-        reg_sshkey
         printf "${green}Checking availability of subdomain '$subdomain'...${reset}\n"
         if wget -q --spider "https://$subdomain.serveo.net"; then
             printf "${red}Subdomain '$subdomain' is not available. Exiting.${reset}\n"
@@ -209,7 +206,6 @@ httptunnel() {
     while true; do    #put this in a loop for a reson. there might be delay in writing
         if [[ -n "$link" ]]; then
             url=$link
-            link=""
             break
         else
             link=$(<"$temp_file")

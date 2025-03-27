@@ -26,7 +26,7 @@ Whether you’re a developer looking for quick web hosting or a hobbyist needing
    Open a terminal and navigate to the directory where the `.deb` file is located. Then, run the following command:
 
    ```bash
-   sudo dpkg -i nethost_v1.0.1.deb && sudo apt-get install -f
+   sudo dpkg -i nethost_v1.2.0.deb && sudo apt-get install -f
    ```
 ## Usage
 
